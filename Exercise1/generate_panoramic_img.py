@@ -48,7 +48,7 @@ def generate_panoramic_img(img1, img2, M, min_points, max_points):
     #変換後画像のための行列を作成。
     new_width = abs(min_points[0]) + abs(max_points[0]) 
     new_height = abs(min_points[1]) + abs(max_points[1])
-    print(new_width, new_height)
+    print("panorama image size:", new_width, new_height)
     new_img = np.zeros((new_height, new_width, 3))
     # print(new_img.shape)
 
@@ -65,14 +65,17 @@ def generate_panoramic_img(img1, img2, M, min_points, max_points):
     offset_x = abs(min_points[0])
     offset_y = abs(min_points[1])
 
+    print(offset_x, offset_y)
+    # print(img2.shape)
+
     for i in range(-(offset_y), new_img.shape[0] - offset_y):      #y軸
         for j in range(-(offset_x), new_img.shape[1] - offset_x):     #x軸
             dst_pixel = np.array([j, i, 1])
             x, y, w = np.dot(M_inv, dst_pixel)
             src_pixel = np.array([x/w, y/w]).astype(np.int32)
-            # print(type(dst_pixel[0]))
-            if(0 < src_pixel[0] < img2.shape[0] and 0 < src_pixel[1] < img2.shape[1]):
-                new_img[i + offset_y][j + offset_x] = img2[src_pixel[1]][src_pixel[0]]
+            # print(src_pixel)
+            if(0 <= src_pixel[0] < img2.shape[1] and 0 <= src_pixel[1] < img2.shape[0]):
+                new_img[i + offset_y, j + offset_x] = img2[src_pixel[1], src_pixel[0]]
 
     cv2.imwrite('homography.jpg',new_img)
 
